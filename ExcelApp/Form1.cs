@@ -28,6 +28,7 @@ namespace ExcelApp
 
         private void openFile_Click(object sender, EventArgs e)
         {
+            int s = 5;
             // Фильтр от лишних форматов, только xlsx.
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "Excel workbook (.xlsx)|*.xlsx";
