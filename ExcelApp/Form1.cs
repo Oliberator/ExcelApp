@@ -71,6 +71,7 @@ namespace ExcelApp
 
         private void safeFile_Click(object sender, EventArgs e)
         {
+            int commitTest;
             // Фильтр от лишних форматов, только xlsx.
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "Excel workbook (.xlsx)|*.xlsx";
