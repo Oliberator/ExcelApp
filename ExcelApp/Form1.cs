@@ -4,10 +4,9 @@ using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using ClosedXML.Excel;
-
 namespace ExcelApp
 {
-    public partial class Form1 : Form
+    public partial class mainForm : Form
     {
         public class Winners
         {
@@ -19,13 +18,13 @@ namespace ExcelApp
             }
         }
 
-        public Form1()
+        public mainForm()
         {
             InitializeComponent();
         }
         DataTable dt = new DataTable();
         DataTable sortedDT = new DataTable();
-
+        int txtResult;
         private void openFile_Click(object sender, EventArgs e)
         {
             // Фильтр от лишних форматов, только xlsx.
@@ -71,7 +70,6 @@ namespace ExcelApp
 
         private void safeFile_Click(object sender, EventArgs e)
         {
-            int commitTest;
             // Фильтр от лишних форматов, только xlsx.
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "Excel workbook (.xlsx)|*.xlsx";
@@ -159,12 +157,40 @@ namespace ExcelApp
                     wins.Add(new Winners() { Name = name, Number = sum });
                 }
 
+
                 // Вывод 3-х победителей олимпиады
-                foreach(var num in wins.OrderByDescending(n => n.Number).Take(3))
+                foreach (var num in wins.OrderByDescending(n => n.Number).Take(3))
                 {
-                    MessageBox.Show(num.ToString());
+                   
+                    if (num.Number == txtResult)
+                    {
+                        MessageBox.Show(num.ToString());
+                    }
                 }
             }
+        }
+        private void score_Click(object sender, EventArgs e)
+        {
+            txtResult = Convert.ToInt32(txtRes.Text);
+        }
+
+        private void txtRes_TextChanged(object sender, EventArgs e)
+        {
+            int intValue;
+            //bool res = Int32.TryParse(txtRes.Text, out intValue);
+            if(txtRes.Text != "")
+            {
+                if (Int32.TryParse(txtRes.Text, out intValue))
+                {
+                    txtResult = Convert.ToInt32(txtRes.Text);
+                }
+                else
+                {
+                    MessageBox.Show("Введенное число не является целым, либо\nслишком большое!", "Предупреждение!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtRes.Clear();
+                }
+            }
+           
         }
     }
 }
