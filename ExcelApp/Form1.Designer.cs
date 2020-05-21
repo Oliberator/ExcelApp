@@ -49,6 +49,7 @@
             this.dtGrid.Name = "dtGrid";
             this.dtGrid.Size = new System.Drawing.Size(784, 396);
             this.dtGrid.TabIndex = 4;
+            this.dtGrid.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dtGrid_DataError);
             // 
             // openFile
             // 

@@ -12,10 +12,6 @@ namespace ExcelApp
         {
             public string Name { get; set; }
             public int Number { get; set; }
-            public override string ToString()
-            {
-                return "Участник: " + Name + "   Баллов: " + Number;
-            }
         }
 
         public mainForm()
@@ -127,14 +123,14 @@ namespace ExcelApp
         {
             // Хранятся сумма всех баллов и 3-х максимальных
             List<Winners> wins = new List<Winners>();
-
+            string score = "";
             // Если пустой грид, то ждём пока станет не пустым
             if (!dtGrid.Rows.Equals(""))
             {
                 // Перебор всех строк грида
                 for (int i = 0; i < dtGrid.Rows.Count; i++)
                 {
-                    
+
                     // Счётчик суммы
                     int sum = 0;
                     string name = "";
@@ -156,28 +152,29 @@ namespace ExcelApp
                     // Добавление фио и баллов в коллекцию
                     wins.Add(new Winners() { Name = name, Number = sum });
                 }
-
-
+            }
                 // Вывод 3-х победителей олимпиады
-                foreach (var num in wins.OrderByDescending(n => n.Number).Take(3))
+                if (txtRes.Text != "")
                 {
-                   
-                    if (num.Number == txtResult)
+                    foreach (var num in wins.OrderByDescending(n => n.Number).Take(3))
                     {
-                        MessageBox.Show(num.ToString());
+                        // Запись победителей в строку
+                        if (num.Number >= txtResult)
+                        {
+                            score += "Победитель: " + num.Name + ", кол-во баллов: " + num.Number + "\n";
+                        }
                     }
                 }
-            }
-        }
-        private void score_Click(object sender, EventArgs e)
-        {
-            txtResult = Convert.ToInt32(txtRes.Text);
-        }
 
+                // Вывод окна победителей если они есть
+                if (score != "")
+                {
+                    MessageBox.Show(score, "Поздравляем победителей!");
+                }
+        }
         private void txtRes_TextChanged(object sender, EventArgs e)
         {
             int intValue;
-            //bool res = Int32.TryParse(txtRes.Text, out intValue);
             if(txtRes.Text != "")
             {
                 if (Int32.TryParse(txtRes.Text, out intValue))
@@ -190,7 +187,10 @@ namespace ExcelApp
                     txtRes.Clear();
                 }
             }
-           
+        }
+        private void dtGrid_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            MessageBox.Show("Вы ввели не число, проверьте введенные данные!","Произошла ошибка!",MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }
