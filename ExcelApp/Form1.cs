@@ -4,6 +4,8 @@ using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Bibliography;
+
 namespace ExcelApp
 {
     public partial class mainForm : Form
@@ -29,9 +31,8 @@ namespace ExcelApp
             ofd.Title = "Выберите таблицу Excel";
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                // Для открытия других таблиц
-                dt.Columns.Clear();
-                dt.Rows.Clear();
+                //dt.Rows.Clear();
+                //dt.Columns.Clear();
                 // Сохранение пути выбранного файла в filePath.
                 // Создание новой книги Excel, внутри нее лист с содержимым из filePath.
                 string filePath = ofd.FileName;
@@ -46,9 +47,7 @@ namespace ExcelApp
                     if (firstRow)
                     {
                         foreach (IXLCell cell in row.Cells())
-                        {
                             dt.Columns.Add(cell.Value.ToString());
-                        }
                         firstRow = false;
                     }
                     else
@@ -66,7 +65,6 @@ namespace ExcelApp
             // Значение таблицы dt в dtGrid
             dtGrid.DataSource = dt;
         }
-
         private void safeFile_Click(object sender, EventArgs e)
         {
             // Фильтр от лишних форматов, только xlsx.
@@ -95,6 +93,7 @@ namespace ExcelApp
                     dt.Columns.Add("2 тур", typeof(Int32));
                     dt.Columns.Add("3 тур", typeof(Int32));
                     dt.Columns.Add("Баллы", typeof(Int32));
+
                 }
                 foreach (DataColumn col in dt.Columns)
                     col.ReadOnly = false;
@@ -105,7 +104,6 @@ namespace ExcelApp
                 DataView dv = dt.DefaultView;
                 dv.Sort = "Номер сдачи";
                 sortedDT = dv.ToTable();
-
                 int a = 1;
                 dtGrid.DataSource = sortedDT;
 
@@ -113,14 +111,12 @@ namespace ExcelApp
                 {
                     for (int j = 1; j < dtGrid.Rows[i].Cells.Count - 4; j++)
                     {
-
                         dtGrid.Rows[i].Cells[j].Value = a;
                         a++;
                     }
                 }
             }
         }
-
         private void winners_Click(object sender, EventArgs e)
         {
             // Хранятся фио участников и сумма всех баллов
@@ -132,20 +128,19 @@ namespace ExcelApp
                 // Перебор всех строк грида
                 for (int i = 0; i < dtGrid.Rows.Count; i++)
                 {
-
                     // Счётчик суммы
                     int sum = 0;
                     string name = "";
                     // Перебор ячеек 1-3 тур
                     for (int j = 2; j < dtGrid.Rows[i].Cells.Count - 1; j++)
                     {
-                        name = Convert.ToString(dtGrid.Rows[i].Cells[0].Value);
                         // роверка данных в ячейках
                         int intValue;
                         bool success = Int32.TryParse(Convert.ToString(dtGrid.Rows[i].Cells[j].Value), out intValue);
                         // сли всё ок, считаем и добавляем сумму в ячейку Баллы
                         if (success)
                         {
+                            name = Convert.ToString(dtGrid.Rows[i].Cells[0].Value);
                             int row = Convert.ToInt32(dtGrid.Rows[i].Cells[j].Value);
                             sum = sum + row;
                             dtGrid.Rows[i].Cells[dtGrid.Rows[i].Cells.Count - 1].Value = sum;
@@ -162,17 +157,13 @@ namespace ExcelApp
                     {
                         // Запись победителей в строку
                         if (num.Number >= txtResult)
-                        {
                             score += "Победитель: " + num.Name + ", кол-во баллов: " + num.Number + "\n";
-                        }
                     }
                 }
 
                 // Вывод окна победителей если они есть
                 if (score != "")
-                {
                     MessageBox.Show(score, "Поздравляем победителей!");
-                }
         }
         private void txtRes_TextChanged(object sender, EventArgs e)
         {
@@ -180,9 +171,7 @@ namespace ExcelApp
             if(txtRes.Text != "")
             {
                 if (Int32.TryParse(txtRes.Text, out intValue))
-                {
                     txtResult = Convert.ToInt32(txtRes.Text);
-                }
                 else
                 {
                     MessageBox.Show("Введенное число не является целым, либо\nслишком большое!", "Предупреждение!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
