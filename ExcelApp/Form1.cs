@@ -29,6 +29,9 @@ namespace ExcelApp
             ofd.Title = "Выберите таблицу Excel";
             if (ofd.ShowDialog() == DialogResult.OK)
             {
+                // Для открытия других таблиц
+                dt.Columns.Clear();
+                dt.Rows.Clear();
                 // Сохранение пути выбранного файла в filePath.
                 // Создание новой книги Excel, внутри нее лист с содержимым из filePath.
                 string filePath = ofd.FileName;
@@ -60,7 +63,7 @@ namespace ExcelApp
                     }
                 }
             }
-            // ЗНачение таблицы dt в dtGrid
+            // Значение таблицы dt в dtGrid
             dtGrid.DataSource = dt;
         }
 
@@ -83,7 +86,6 @@ namespace ExcelApp
 
         private void randTime_Click(object sender, EventArgs e)
         {
-
             if (dtGrid.DataSource != null)
             {
                 if (!dt.Columns.Contains("Номер сдачи"))
@@ -121,7 +123,7 @@ namespace ExcelApp
 
         private void winners_Click(object sender, EventArgs e)
         {
-            // Хранятся сумма всех баллов и 3-х максимальных
+            // Хранятся фио участников и сумма всех баллов
             List<Winners> wins = new List<Winners>();
             string score = "";
             // Если пустой грид, то ждём пока станет не пустым

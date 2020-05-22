@@ -113,7 +113,7 @@
             // 
             // txtRes
             // 
-            this.txtRes.Location = new System.Drawing.Point(146, 2);
+            this.txtRes.Location = new System.Drawing.Point(143, 2);
             this.txtRes.Name = "txtRes";
             this.txtRes.Size = new System.Drawing.Size(100, 20);
             this.txtRes.TabIndex = 10;
@@ -122,11 +122,14 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 6);
+            this.label1.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.label1.Cursor = System.Windows.Forms.Cursors.Default;
+            this.label1.ForeColor = System.Drawing.Color.Black;
+            this.label1.Location = new System.Drawing.Point(10, 5);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(127, 13);
+            this.label1.Size = new System.Drawing.Size(130, 13);
             this.label1.TabIndex = 11;
-            this.label1.Text = "Введи балл для победы";
+            this.label1.Text = "Введи балл для победы:";
             // 
             // mainForm
             // 
