@@ -135,10 +135,10 @@ namespace ExcelApp
                     // Перебор ячеек 1-3 тур
                     for (int j = 2; j < dtGrid.Rows[i].Cells.Count - 1; j++)
                     {
-                        // роверка данных в ячейках
+                        // Проверка данных в ячейках
                         int intValue;
                         bool success = Int32.TryParse(Convert.ToString(dtGrid.Rows[i].Cells[j].Value), out intValue);
-                        // сли всё ок, считаем и добавляем сумму в ячейку Баллы
+                        // Если всё ок, считаем и добавляем сумму в ячейку Баллы
                         if (success)
                         {
                             name = Convert.ToString(dtGrid.Rows[i].Cells[0].Value);
