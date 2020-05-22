@@ -146,7 +146,7 @@
             this.Controls.Add(this.openFile);
             this.Controls.Add(this.dtGrid);
             this.Controls.Add(this.menuStrip1);
-            this.ForeColor = System.Drawing.Color.White;
+            this.ForeColor = System.Drawing.Color.Black;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "mainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
