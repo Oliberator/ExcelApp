@@ -31,8 +31,9 @@ namespace ExcelApp
             ofd.Title = "Выберите таблицу Excel";
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                //dt.Rows.Clear();
-                //dt.Columns.Clear();
+                // Удаление старой таблицы
+                dt.Rows.Clear();
+                dt.Columns.Clear();
                 // Сохранение пути выбранного файла в filePath.
                 // Создание новой книги Excel, внутри нее лист с содержимым из filePath.
                 string filePath = ofd.FileName;
