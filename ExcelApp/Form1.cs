@@ -29,7 +29,6 @@ namespace ExcelApp
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 // Очистка таблицы от старых значений
-                dtGrid.DataSource = dt;
                 dt.Rows.Clear();
                 dt.Columns.Clear();
 
@@ -61,6 +60,7 @@ namespace ExcelApp
                         }
                     }
                 }
+                dtGrid.DataSource = dt;
             }
         }
         private void safeFile_Click(object sender, EventArgs e)
@@ -192,8 +192,15 @@ namespace ExcelApp
             int intValue;
             if(txtRes.Text != "")
             {
-                if (Int32.TryParse(txtRes.Text, out intValue))
+                if (Int32.TryParse(txtRes.Text, out intValue)) 
+                { 
                     txtResult = Convert.ToInt32(txtRes.Text);
+                    if (txtResult <= 0)
+                    {
+                        MessageBox.Show("Минимальный балл не может быть равен 0.", "Предупреждение!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtRes.Clear();
+                    }
+                }
                 else
                 {
                     MessageBox.Show("Введенное число не является целым, либо\nслишком большое!", "Предупреждение!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
