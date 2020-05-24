@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Bibliography;
 
 namespace ExcelApp
 {
@@ -21,7 +20,6 @@ namespace ExcelApp
             InitializeComponent();
         }
         DataTable dt = new DataTable();
-        DataTable sortedDT = new DataTable();
         int txtResult;
         private void openFile_Click(object sender, EventArgs e)
         {
@@ -29,9 +27,9 @@ namespace ExcelApp
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "Excel workbook (.xlsx)|*.xlsx";
             ofd.Title = "Выберите таблицу Excel";
+            dtGrid.DataSource = dt;
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                // Удаление старой таблицы
                 dt.Rows.Clear();
                 dt.Columns.Clear();
                 // Сохранение пути выбранного файла в filePath.
@@ -63,8 +61,6 @@ namespace ExcelApp
                     }
                 }
             }
-            // Значение таблицы dt в dtGrid
-            dtGrid.DataSource = dt;
         }
         private void safeFile_Click(object sender, EventArgs e)
         {
@@ -76,7 +72,7 @@ namespace ExcelApp
                 // Создание новой XLSX-книги, созданение листа Участники со значением таблицы sortedDT
                 // Сохранение книги в выбранное место на ПК
                 XLWorkbook wb = new XLWorkbook();
-                wb.Worksheets.Add(sortedDT, "Участники");
+                wb.Worksheets.Add(dt, "Участники");
                 string filePath = sfd.FileName;
                 wb.SaveAs(filePath);
             }
@@ -94,20 +90,19 @@ namespace ExcelApp
                     dt.Columns.Add("2 тур", typeof(Int32));
                     dt.Columns.Add("3 тур", typeof(Int32));
                     dt.Columns.Add("Баллы", typeof(Int32));
-
                 }
+
                 foreach (DataColumn col in dt.Columns)
                     col.ReadOnly = false;
                 Random rnd = new Random();
                 foreach (DataRow row in dt.Rows)
-                    row["Номер сдачи"] = rnd.Next(0, dt.Rows.Count);
+                    row["Номер сдачи"] = rnd.Next(1, dt.Rows.Count);
 
                 DataView dv = dt.DefaultView;
                 dv.Sort = "Номер сдачи";
-                sortedDT = dv.ToTable();
+                dt = dv.ToTable();
                 int a = 1;
-                dtGrid.DataSource = sortedDT;
-
+                dtGrid.DataSource = dt;
                 for (int i = 0; i < dtGrid.Rows.Count; i++)
                 {
                     for (int j = 1; j < dtGrid.Rows[i].Cells.Count - 4; j++)
@@ -182,7 +177,7 @@ namespace ExcelApp
         }
         private void dtGrid_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
-            MessageBox.Show("Вы ввели не число, проверьте введенные данные!","Произошла ошибка!",MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Вы ввели не число, проверьте введенные данные!","Предупреждение!",MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 }
