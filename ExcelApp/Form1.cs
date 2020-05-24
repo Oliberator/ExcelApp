@@ -14,7 +14,6 @@ namespace ExcelApp
             public string Name { get; set; }
             public int Number { get; set; }
         }
-
         public mainForm()
         {
             InitializeComponent();
@@ -27,9 +26,9 @@ namespace ExcelApp
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "Excel workbook (.xlsx)|*.xlsx";
             ofd.Title = "Выберите таблицу Excel";
-            dtGrid.DataSource = dt;
             if (ofd.ShowDialog() == DialogResult.OK)
             {
+                dtGrid.DataSource = dt;
                 dt.Rows.Clear();
                 dt.Columns.Clear();
                 // Сохранение пути выбранного файла в filePath.
@@ -77,6 +76,7 @@ namespace ExcelApp
                 wb.SaveAs(filePath);
             }
             MessageBox.Show("Изменения сохранены!");
+            Application.Restart();
         }
 
         private void randTime_Click(object sender, EventArgs e)
@@ -92,15 +92,19 @@ namespace ExcelApp
                     dt.Columns.Add("Баллы", typeof(Int32));
                 }
 
+                // Устанавливаются рандомные места участникам
                 foreach (DataColumn col in dt.Columns)
                     col.ReadOnly = false;
                 Random rnd = new Random();
                 foreach (DataRow row in dt.Rows)
                     row["Номер сдачи"] = rnd.Next(1, dt.Rows.Count);
 
+                // Запоминаются места
                 DataView dv = dt.DefaultView;
                 dv.Sort = "Номер сдачи";
                 dt = dv.ToTable();
+
+                // Сортировка участников
                 int a = 1;
                 dtGrid.DataSource = dt;
                 for (int i = 0; i < dtGrid.Rows.Count; i++)
@@ -119,7 +123,7 @@ namespace ExcelApp
             List<Winners> wins = new List<Winners>();
             string score = "";
             // Если пустой грид, то ждём пока станет не пустым
-            if (!dtGrid.Rows.Equals(""))
+            if (dtGrid.DataSource != null)
             {
                 // Перебор всех строк грида
                 for (int i = 0; i < dtGrid.Rows.Count; i++)
@@ -128,7 +132,7 @@ namespace ExcelApp
                     int sum = 0;
                     string name = "";
                     // Перебор ячеек 1-3 тур
-                    for (int j = 2; j < dtGrid.Rows[i].Cells.Count - 1; j++)
+                    for (int j = 2; j < dtGrid.Rows[i].Cells.Count-1; j++)
                     {
                         // Проверка данных в ячейках
                         int intValue;
@@ -139,27 +143,33 @@ namespace ExcelApp
                             name = Convert.ToString(dtGrid.Rows[i].Cells[0].Value);
                             int row = Convert.ToInt32(dtGrid.Rows[i].Cells[j].Value);
                             sum = sum + row;
+                            //dtGrid.Rows[i].Cells[dtGrid.Rows[i].Cells.Count - 1].Value = sum;
                             dtGrid.Rows[i].Cells[dtGrid.Rows[i].Cells.Count - 1].Value = sum;
+                        }
+                        else
+                        {
+                            dtGrid.Rows[i].Cells[j].Value = 0;
                         }
                     }
                     // Добавление фио и баллов в коллекцию
                     wins.Add(new Winners() { Name = name, Number = sum });
                 }
             }
-                // Вывод 3-х победителей олимпиады
-                if (txtRes.Text != "")
+            // Вывод 3-х победителей олимпиады
+            if (txtRes.Text != "")
+            {
+                foreach (var num in wins.OrderByDescending(n => n.Number).Take(3))
                 {
-                    foreach (var num in wins.OrderByDescending(n => n.Number).Take(3))
-                    {
-                        // Запись победителей в строку
-                        if (num.Number >= txtResult)
-                            score += "Победитель: " + num.Name + ", кол-во баллов: " + num.Number + "\n";
-                    }
+                    // Запись победителей в строку
+                    if (num.Number >= txtResult)
+                        score += "Победитель: " + num.Name + ", кол-во баллов: " + num.Number + "\n";
                 }
+            }
 
-                // Вывод окна победителей если они есть
-                if (score != "")
-                    MessageBox.Show(score, "Поздравляем победителей!");
+            // Вывод окна победителей если они есть
+            if (score != "")
+                MessageBox.Show(score, "Поздравляем победителей!");
+            dtGrid.DataSource = dt;
         }
         private void txtRes_TextChanged(object sender, EventArgs e)
         {
