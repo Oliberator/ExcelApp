@@ -18,8 +18,8 @@ namespace ExcelApp
         {
             InitializeComponent();
         }
-        DataTable dt = new DataTable();
-        int txtResult;
+        DataTable dt = new DataTable(); // Глобальная таблица, хранит данные из Excel-файла
+        int txtResult; // Хранит число из строки с мин. баллом
         private void openFile_Click(object sender, EventArgs e)
         {
             // Фильтр от лишних форматов, только xlsx.
@@ -28,17 +28,19 @@ namespace ExcelApp
             ofd.Title = "Выберите таблицу Excel";
             if (ofd.ShowDialog() == DialogResult.OK)
             {
+                // Очистка таблицы от старых значений
                 dtGrid.DataSource = dt;
                 dt.Rows.Clear();
                 dt.Columns.Clear();
+
                 // Сохранение пути выбранного файла в filePath.
                 // Создание новой книги Excel, внутри нее лист с содержимым из filePath.
                 string filePath = ofd.FileName;
                 var workbook = new XLWorkbook(filePath);
                 var worksheet = workbook.Worksheet(1);
 
-                // Если столбец есть в книге, добавляем в таблицу программы
-                // Иначе добавляем остальные строки
+                // Если столбец есть в книге, добавляем его в таблицу программы
+                // После добавляем остальные строки
                 bool firstRow = true;
                 foreach (IXLRow row in worksheet.Rows())
                 {
@@ -68,19 +70,36 @@ namespace ExcelApp
             sfd.Filter = "Excel workbook (.xlsx)|*.xlsx";
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                // Создание новой XLSX-книги, созданение листа Участники со значением таблицы sortedDT
+                // Заполнение пустых ячеек нулями
+                if (dtGrid.DataSource != null)
+                {
+                    for (int i = 0; i < dtGrid.Rows.Count; i++)
+                    {
+                        for (int j = 2; j < dtGrid.Rows[i].Cells.Count; j++)
+                        {
+                            if (Convert.ToString(dtGrid.Rows[i].Cells[j].Value) == "")
+                            {
+                                dtGrid.Rows[i].Cells[j].Value = 0;
+                            }
+                        }
+                    }
+                }
+                // Создание новой XLSX-книги, сохранение таблицы на новом листе
                 // Сохранение книги в выбранное место на ПК
                 XLWorkbook wb = new XLWorkbook();
                 wb.Worksheets.Add(dt, "Участники");
                 string filePath = sfd.FileName;
                 wb.SaveAs(filePath);
+                MessageBox.Show("Изменения сохранены!");
+
+                // Перезапуск приложения после сохранения
+                Application.Restart();
             }
-            MessageBox.Show("Изменения сохранены!");
-            Application.Restart();
         }
 
         private void randTime_Click(object sender, EventArgs e)
         {
+            // Проверка на наличие данных в dtGrid и столбцов в dt
             if (dtGrid.DataSource != null)
             {
                 if (!dt.Columns.Contains("Номер сдачи"))
@@ -91,7 +110,6 @@ namespace ExcelApp
                     dt.Columns.Add("3 тур", typeof(Int32));
                     dt.Columns.Add("Баллы", typeof(Int32));
                 }
-
                 // Устанавливаются рандомные места участникам
                 foreach (DataColumn col in dt.Columns)
                     col.ReadOnly = false;
@@ -104,7 +122,7 @@ namespace ExcelApp
                 dv.Sort = "Номер сдачи";
                 dt = dv.ToTable();
 
-                // Сортировка участников
+                // Сортировка участников по возрастанию
                 int a = 1;
                 dtGrid.DataSource = dt;
                 for (int i = 0; i < dtGrid.Rows.Count; i++)
@@ -122,35 +140,34 @@ namespace ExcelApp
             // Хранятся фио участников и сумма всех баллов
             List<Winners> wins = new List<Winners>();
             string score = "";
+
             // Если пустой грид, то ждём пока станет не пустым
             if (dtGrid.DataSource != null)
             {
                 // Перебор всех строк грида
                 for (int i = 0; i < dtGrid.Rows.Count; i++)
                 {
-                    // Счётчик суммы
+                    // Счётчик суммы и строка под каждое ФИО участника
                     int sum = 0;
                     string name = "";
+
                     // Перебор ячеек 1-3 тур
                     for (int j = 2; j < dtGrid.Rows[i].Cells.Count-1; j++)
                     {
                         // Проверка данных в ячейках
                         int intValue;
                         bool success = Int32.TryParse(Convert.ToString(dtGrid.Rows[i].Cells[j].Value), out intValue);
-                        // Если всё ок, считаем и добавляем сумму в ячейку Баллы
+
+                        // Если всё ок, считаем и добавляем сумму в ячейки столбца Баллы
                         if (success)
                         {
                             name = Convert.ToString(dtGrid.Rows[i].Cells[0].Value);
                             int row = Convert.ToInt32(dtGrid.Rows[i].Cells[j].Value);
                             sum = sum + row;
-                            //dtGrid.Rows[i].Cells[dtGrid.Rows[i].Cells.Count - 1].Value = sum;
                             dtGrid.Rows[i].Cells[dtGrid.Rows[i].Cells.Count - 1].Value = sum;
                         }
-                        else
-                        {
-                            dtGrid.Rows[i].Cells[j].Value = 0;
-                        }
                     }
+
                     // Добавление фио и баллов в коллекцию
                     wins.Add(new Winners() { Name = name, Number = sum });
                 }
@@ -165,14 +182,13 @@ namespace ExcelApp
                         score += "Победитель: " + num.Name + ", кол-во баллов: " + num.Number + "\n";
                 }
             }
-
             // Вывод окна победителей если они есть
             if (score != "")
                 MessageBox.Show(score, "Поздравляем победителей!");
-            dtGrid.DataSource = dt;
         }
         private void txtRes_TextChanged(object sender, EventArgs e)
         {
+            // Проверка на вводимые данные, вывод предупреждения
             int intValue;
             if(txtRes.Text != "")
             {
@@ -187,6 +203,7 @@ namespace ExcelApp
         }
         private void dtGrid_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
+            // При неверном вводе данных в ячейки таблицы
             MessageBox.Show("Вы ввели не число, проверьте введенные данные!","Предупреждение!",MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
